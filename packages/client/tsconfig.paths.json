@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+
+    "paths": {
+      "@i-wanna-talk/server/*": ["../../packages/server/src/*"],
+      "@i-wanna-talk/*": ["../../packages/*/src"],
+
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"]
+    }
+  }
+}
