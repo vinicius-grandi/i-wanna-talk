@@ -1,7 +1,8 @@
-import 'socket.io';
+import "socket.io";
 
-declare module 'socket.io' {
+declare module "socket.io" {
   interface Socket {
-    username: string;
+    isUserFluent: boolean;
+    languageCode: string;
   }
 }

@@ -4,7 +4,7 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "jest"
+    "test": "jest --detectOpenHandles"
   },
   "license": "MIT",
   "dependencies": {
