@@ -17,28 +17,22 @@ describe("Chat", () => {
     clientSocket2.close();
     server.close();
   });
-  it("should send a message from one user to another", (done) => {
-    clientSocket.auth = { username: "jojo" };
-    clientSocket2.auth = { username: "giorno" };
+  it("should send messages between users", (done) => {
+    clientSocket.auth = { isUserFluent: false, languageCode: "BR" };
+    clientSocket2.auth = { isUserFluent: true, languageCode: "BR" };
     clientSocket.open();
     clientSocket2.open();
 
-    clientSocket.on(
-      "user connected",
-      (arg: { username: string; userID: string }) => {
-        clientSocket.emit("private message", {
-          content: "hello!",
-          to: arg.userID,
-        });
-      }
-    );
+    clientSocket2.on("room created", (roomName: string) => {
+      clientSocket.emit("private message", {
+        content: "hello!",
+        roomName,
+      });
+    });
 
-    clientSocket2.on(
-      "private message",
-      (arg: { content: string; from: string }) => {
-        expect(arg.content).toBe("hello!");
-        done();
-      }
-    );
+    clientSocket2.on("private message", (content: string) => {
+      expect(content).toBe("hello!");
+      done();
+    });
   });
 });
