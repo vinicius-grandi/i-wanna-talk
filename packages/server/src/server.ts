@@ -1,6 +1,7 @@
 import app from "./app";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import logger from "jet-logger";
 
 const server = createServer(app);
 const io = new Server(server);
@@ -26,31 +27,38 @@ io.use((socket, next) => {
   return next();
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   // fetch existing users
   const room = io.sockets.adapter.rooms.has(socket.languageCode);
   if (room) {
-    io.in(socket.languageCode)
-      .fetchSockets<{
-        isUserFluent: boolean;
-        languageCode: string;
-      }>()
-      .then((clients) => {
-        clients.forEach((client) => {
-          if (client.data.isUserFluent !== socket.isUserFluent) {
-            const roomName = `${socket.languageCode}-${Math.floor(
-              Math.random() * 1000000
-            )}`;
-            client.join(roomName);
-            socket.join(roomName);
-            client.leave(socket.languageCode);
-            socket.leave(socket.languageCode);
-            io.to(roomName).emit("room created", roomName);
-          }
-        });
-      });
+    let noFluent: boolean = false;
+    const clients = await io.in(socket.languageCode).fetchSockets<{
+      isUserFluent: boolean;
+      languageCode: string;
+    }>();
+    clients.forEach((client) => {
+      if (client.data.isUserFluent !== socket.isUserFluent) {
+        const roomName = `${socket.languageCode}-${Math.floor(
+          Math.random() * 1000000
+        )}`;
+        client.join(roomName);
+        socket.join(roomName);
+        client.leave(socket.languageCode);
+        socket.leave(socket.languageCode);
+        io.to(roomName).emit("room status", roomName);
+      } else {
+        noFluent = true;
+      }
+    });
+    if (noFluent) {
+      io.to(socket.id).emit(
+        "room status",
+        "No fluents available in the chose language"
+      );
+    }
   } else {
     socket.join(socket.languageCode);
+    socket.emit("lobby", "You just joined the lobby");
   }
 
   socket.on(

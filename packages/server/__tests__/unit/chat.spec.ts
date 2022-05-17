@@ -5,6 +5,9 @@ describe("Chat", () => {
   let clientSocket: Socket, clientSocket2: Socket;
   beforeAll(() => {
     server.listen(5001);
+  });
+
+  beforeEach(() => {
     clientSocket = Client(`http://localhost:5001`, {
       autoConnect: false,
     });
@@ -12,10 +15,14 @@ describe("Chat", () => {
       autoConnect: false,
     });
   });
-  afterAll(() => {
+  afterEach(() => {
     clientSocket.close();
     clientSocket2.close();
+  });
+  afterAll(() => {
     server.close();
+    clientSocket.close();
+    clientSocket2.close();
   });
   it("should send messages between users", (done) => {
     clientSocket.auth = { isUserFluent: false, languageCode: "BR" };
@@ -23,10 +30,10 @@ describe("Chat", () => {
     clientSocket.open();
     clientSocket2.open();
 
-    clientSocket2.on("room created", (roomName: string) => {
+    clientSocket2.on("room status", (msg: string) => {
       clientSocket.emit("private message", {
         content: "hello!",
-        roomName,
+        roomName: msg,
       });
     });
 
@@ -35,4 +42,19 @@ describe("Chat", () => {
       done();
     });
   });
+  it("should send a status message when no one is fluent", (done) => {
+    clientSocket.auth = { isUserFluent: true, languageCode: "BR" };
+    clientSocket2.auth = { isUserFluent: true, languageCode: "BR" };
+    clientSocket.open();
+    clientSocket2.open();
+
+    clientSocket.onAny((ev) => console.log(ev));
+    clientSocket2.onAny((ev) => console.log(ev));
+
+    clientSocket2.on("room status", (msg: string) => {
+      console.log("teste");
+      expect(msg).toBe("No fluents available in the chose language");
+      done();
+    });
+  }, 20000);
 });
