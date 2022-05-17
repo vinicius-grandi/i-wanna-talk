@@ -1,10 +1,9 @@
 import app from "./app";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import logger from "jet-logger";
 
 const server = createServer(app);
-const io = new Server(server);
+export const io = new Server(server);
 
 io.use((socket, next) => {
   const {
@@ -67,6 +66,8 @@ io.on("connection", async (socket) => {
       io.to(roomName).emit("private message", content);
     }
   );
+
+  io.on("leave", () => socket.disconnect(true));
 
   // notify users upon disconnection
   socket.on("disconnect", () => {
