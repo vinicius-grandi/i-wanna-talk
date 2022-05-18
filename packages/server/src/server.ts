@@ -67,8 +67,6 @@ io.on("connection", async (socket) => {
     }
   );
 
-  io.on("leave", () => socket.disconnect(true));
-
   // notify users upon disconnection
   socket.on("disconnect", () => {
     socket.broadcast.emit("user disconnected", socket.id);
