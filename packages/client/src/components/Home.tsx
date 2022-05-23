@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import LanguageModal from './LanguageModal';
 
@@ -42,6 +42,13 @@ const NonFluent = styled.button`
 
 function Home(): JSX.Element {
   const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    async function memes(): Promise<void> {
+      const me = await fetch('/backend');
+      console.log(me);
+    }
+    memes();
+  });
   return (
     <Container>
       <Buttons>

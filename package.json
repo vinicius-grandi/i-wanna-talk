@@ -6,13 +6,13 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "lerna run clean",
-    "build": "lerna run build",
-    "test": "lerna run test",
-    "pub": "lerna publish"
+    "client": "cd packages/client && pnpm start",
+    "backend": "cd packages/server && pnpm start:dev",
+    "test": "concurrently --kill-others-on-fail \"pnpm backend\" \"pnpm client\""
   },
   "devDependencies": {
     "@nighttrax/eslint-config-tsx": "^10.0.0-beta.0",
+    "concurrently": "^7.2.1",
     "create-react-app": "^5.0.1",
     "lerna": "^4.0.0",
     "typescript": "^4.6.0"

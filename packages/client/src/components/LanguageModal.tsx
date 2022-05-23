@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { countries } from 'country-flag-icons';
 import getUnicodeFlagIcon from 'country-flag-icons/unicode';
@@ -41,19 +41,37 @@ function LanguageModal({
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element {
   const modalRef = useRef<HTMLUListElement>(null);
+  const [filter, setFilter] = useState('');
   const scroll = useRef(0);
+
+  const filterCodes = useCallback(
+    (ev: KeyboardEvent): void => {
+      if (ev.key === 'Backspace') {
+        setFilter('');
+      }
+      const keyCode = ev.key.toLowerCase().charCodeAt(0);
+      const newFilter = filter + ev.key;
+      if (
+        keyCode >= 97 &&
+        keyCode <= 122 &&
+        ev.key.length === 1 &&
+        newFilter.length <= 2
+      ) {
+        return setFilter(filter + ev.key);
+      }
+      return setFilter('');
+    },
+    [filter],
+  );
 
   const draggingScroll = (e: MouseEvent): void => {
     if (e.currentTarget instanceof HTMLUListElement) {
-      console.log(scroll.current - e.clientY);
-
       e.currentTarget.scrollBy(0, scroll.current - e.clientY);
     }
   };
 
   const mouseDownHandler = useCallback(
     (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => {
-      console.log(e.clientY);
       if (e.currentTarget instanceof HTMLUListElement) {
         scroll.current = e.clientY;
         e.currentTarget.addEventListener('mousemove', draggingScroll);
@@ -72,26 +90,38 @@ function LanguageModal({
     [],
   );
 
-  window.onmouseup = () => {
-    if (modalRef.current) {
-      modalRef.current.removeEventListener('mousemove', draggingScroll);
-    }
-  };
+  useEffect(() => {
+    document.addEventListener('keydown', filterCodes);
+    return () => document.removeEventListener('keydown', filterCodes);
+  }, [filterCodes]);
 
   return (
     <>
       <Modal
         onMouseDown={mouseDownHandler}
         onMouseUp={mouseUpHandler}
+        onMouseOut={(e) => {
+          e.currentTarget.removeEventListener('mousemove', draggingScroll);
+        }}
         ref={modalRef}
       >
-        {countries.map((code) => (
-          <li key={code}>
-            {getUnicodeFlagIcon(code)} {code}
-          </li>
-        ))}
+        {countries
+          .filter((code) => {
+            const regex = new RegExp(`^${filter}`, 'i');
+            return code.match(regex);
+          })
+          .map((code) => (
+            <li key={code}>
+              {getUnicodeFlagIcon(code)} {code}
+            </li>
+          ))}
       </Modal>
-      <CloseButton type="button" onClick={() => setShowModal(false)}>
+      <CloseButton
+        type="button"
+        onClick={() => {
+          setShowModal(false);
+        }}
+      >
         <X />
       </CloseButton>
     </>

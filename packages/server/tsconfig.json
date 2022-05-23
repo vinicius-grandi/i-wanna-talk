@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "allowJs": true,
+    "module": "CommonJS",
     "outDir": "dist",
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,5 +21,11 @@
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "./src/typeRoots/index.d.ts",
+  ],
 }

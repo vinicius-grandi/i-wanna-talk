@@ -35,6 +35,7 @@ io.on("connection", async (socket) => {
       isUserFluent: boolean;
       languageCode: string;
     }>();
+
     clients.forEach((client) => {
       if (client.data.isUserFluent !== socket.isUserFluent) {
         const roomName = `${socket.languageCode}-${Math.floor(
@@ -49,6 +50,7 @@ io.on("connection", async (socket) => {
         noFluent = true;
       }
     });
+
     if (noFluent) {
       io.to(socket.id).emit(
         "room status",
