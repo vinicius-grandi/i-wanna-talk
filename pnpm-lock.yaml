@@ -31,6 +31,7 @@ importers:
       '@types/styled-components': ^5.1.25
       '@typescript-eslint/eslint-plugin': ^5.25.0
       '@typescript-eslint/parser': ^5.25.0
+      country-flag-icons: ^1.5.3
       eslint: ^7.32.0
       eslint-config-airbnb: ^19.0.4
       eslint-config-airbnb-typescript: ^17.0.0
@@ -45,6 +46,7 @@ importers:
       prettier: ^2.6.2
       react: ^18.1.0
       react-dom: ^18.1.0
+      react-feather: ^2.0.9
       react-is: ^18.1.0
       react-scripts: 5.0.1
       styled-components: ^5.3.5
@@ -61,8 +63,10 @@ importers:
       '@types/jest': 27.5.1
       '@types/react': 18.0.9
       '@types/react-dom': 18.0.4
+      country-flag-icons: 1.5.3
       react: 18.1.0
       react-dom: 18.1.0_react@18.1.0
+      react-feather: 2.0.9_react@18.1.0
       react-scripts: 5.0.1_2ghl6qw4nd57k27o6rlqnwmat4
       styled-components: 5.3.5_4klixn56hmiqf6hh5nx3jyckvq
       typescript: 4.6.4
@@ -5467,6 +5471,10 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+
+  /country-flag-icons/1.5.3:
+    resolution: {integrity: sha512-441b/ckrY8RY19B+7m+Jl3E9Msj6E89T7Gghl+DdEQeGTLd/qXVTTZbkI1E3O7GzVX4Dmn+a/OLfA7Co44vvzw==}
+    dev: false
 
   /create-react-app/5.0.1:
     resolution: {integrity: sha512-UkxTKK8I9HuZZHqkNq/JkKXDgdLeiRGc+bL58Iae2g+7WwFomAj4wppn6JfqlZM2IKYRlZtgLlmVr5oZfdd1xg==}
@@ -11735,6 +11743,15 @@ packages:
 
   /react-error-overlay/6.0.11:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
+    dev: false
+
+  /react-feather/2.0.9_react@18.1.0:
+    resolution: {integrity: sha512-yMfCGRkZdXwIs23Zw/zIWCJO3m3tlaUvtHiXlW+3FH7cIT6fiK1iJ7RJWugXq7Fso8ZaQyUm92/GOOHXvkiVUw==}
+    peerDependencies:
+      react: ^16.8.6 || ^17
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.1.0
     dev: false
 
   /react-is/16.13.1:

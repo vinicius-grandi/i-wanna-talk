@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import LanguageModal from './LanguageModal';
 
 const Container = styled.main`
   display: flex;
@@ -40,12 +41,18 @@ const NonFluent = styled.button`
 `;
 
 function Home(): JSX.Element {
+  const [showModal, setShowModal] = useState(false);
   return (
     <Container>
       <Buttons>
-        <Fluent type="button">FLUENT</Fluent>
-        <NonFluent type="button">NON-FLUENT</NonFluent>
+        <Fluent type="button" onClick={() => setShowModal(!showModal)}>
+          FLUENT
+        </Fluent>
+        <NonFluent type="button" onClick={() => setShowModal(!showModal)}>
+          NON-FLUENT
+        </NonFluent>
       </Buttons>
+      {showModal && <LanguageModal setShowModal={setShowModal} />}
     </Container>
   );
 }
