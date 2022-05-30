@@ -8,7 +8,7 @@
   "scripts": {
     "client": "cd packages/client && pnpm start",
     "backend": "cd packages/server && pnpm start:dev",
-    "dev": "concurrently --kill-others-on-fail \"pnpm backend\" \"pnpm client\""
+    "dev": "concurrently --kill-others-on-fail \"pnpm client\" \"pnpm backend\""
   },
   "devDependencies": {
     "@nighttrax/eslint-config-tsx": "^10.0.0-beta.0",

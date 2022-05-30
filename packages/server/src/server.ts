@@ -6,10 +6,7 @@ import { Server } from "socket.io";
 const server = createServer(app);
 export const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "test"
-        ? "http://localhost"
-        : "https://googleads.g.doubleclick.net/pagead/id",
+    origin: process.env.NODE_ENV === "test" ? "*" : "",
     methods: ["GET", "POST"],
   },
 });
@@ -74,7 +71,7 @@ io.on("connection", async (socket) => {
   socket.on(
     "private message",
     ({ content, roomName }: { content: string; roomName: string }) => {
-      io.to(roomName).emit("private message", content);
+      socket.to(roomName).emit("private message", content);
     }
   );
 
