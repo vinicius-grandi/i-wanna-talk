@@ -41,25 +41,25 @@ const NonFluent = styled.button`
 `;
 
 function Home(): JSX.Element {
-  const [showModal, setShowModal] = useState(false);
-  useEffect(() => {
-    async function memes(): Promise<void> {
-      const me = await fetch('/backend');
-      console.log(me);
-    }
-    memes();
-  });
+  const [showModal, setShowModal] = useState<boolean | 'fluent' | 'non-fluent'>(
+    false,
+  );
   return (
     <Container>
       <Buttons>
-        <Fluent type="button" onClick={() => setShowModal(!showModal)}>
+        <Fluent type="button" onClick={() => setShowModal('fluent')}>
           FLUENT
         </Fluent>
-        <NonFluent type="button" onClick={() => setShowModal(!showModal)}>
+        <NonFluent type="button" onClick={() => setShowModal('non-fluent')}>
           NON-FLUENT
         </NonFluent>
       </Buttons>
-      {showModal && <LanguageModal setShowModal={setShowModal} />}
+      {showModal && (
+        <LanguageModal
+          setShowModal={setShowModal}
+          isUserFluent={showModal === 'fluent'}
+        />
+      )}
     </Container>
   );
 }

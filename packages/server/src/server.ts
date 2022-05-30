@@ -1,9 +1,18 @@
 import app from "./app";
 import { createServer } from "http";
 import { Server } from "socket.io";
+// import cors from "cors";
 
 const server = createServer(app);
-export const io = new Server(server);
+export const io = new Server(server, {
+  cors: {
+    origin:
+      process.env.NODE_ENV === "test"
+        ? "http://localhost"
+        : "https://googleads.g.doubleclick.net/pagead/id",
+    methods: ["GET", "POST"],
+  },
+});
 
 io.use((socket, next) => {
   const {

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Client, { Socket } from 'socket.io-client';
 import styled from 'styled-components';
 import { countries } from 'country-flag-icons';
 import getUnicodeFlagIcon from 'country-flag-icons/unicode';
@@ -37,9 +38,14 @@ const Modal = styled.ul`
 
 function LanguageModal({
   setShowModal,
+  isUserFluent,
 }: {
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowModal: React.Dispatch<
+    React.SetStateAction<boolean | 'fluent' | 'non-fluent'>
+  >;
+  isUserFluent: boolean;
 }): JSX.Element {
+  const [socket, setSocket] = useState<Socket>();
   const modalRef = useRef<HTMLUListElement>(null);
   const [filter, setFilter] = useState('');
   const scroll = useRef(0);
@@ -90,10 +96,30 @@ function LanguageModal({
     [],
   );
 
+  const chatHandler = (code: string): void => {
+    console.log(code);
+    if (socket) {
+      socket.auth = {
+        languageCode: code,
+        isUserFluent,
+      };
+      socket.connect();
+    }
+  };
+
   useEffect(() => {
     document.addEventListener('keydown', filterCodes);
     return () => document.removeEventListener('keydown', filterCodes);
   }, [filterCodes]);
+
+  // socket.io connection
+  useEffect(() => {
+    setSocket(
+      Client('http://localhost:5001', {
+        autoConnect: false,
+      }),
+    );
+  }, []);
 
   return (
     <>
@@ -111,7 +137,7 @@ function LanguageModal({
             return code.match(regex);
           })
           .map((code) => (
-            <li key={code}>
+            <li key={code} onClick={() => chatHandler(code)}>
               {getUnicodeFlagIcon(code)} {code}
             </li>
           ))}
