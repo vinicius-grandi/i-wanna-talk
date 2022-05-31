@@ -1,10 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Client, { Socket } from 'socket.io-client';
 import styled from 'styled-components';
 import { countries } from 'country-flag-icons';
 import getUnicodeFlagIcon from 'country-flag-icons/unicode';
 import { X } from 'react-feather';
 import Chat from './Chat';
+import Overlay from 'react-bootstrap/Overlay';
 
 const CloseButton = styled.button`
   position: absolute;
@@ -12,7 +19,7 @@ const CloseButton = styled.button`
   right: 0;
 `;
 
-const Modal = styled.ul`
+const LanguageList = styled.ul`
   user-select: none;
   overflow-y: auto;
   overflow-x: hidden;
@@ -37,7 +44,13 @@ const Modal = styled.ul`
   }
 `;
 
-function LanguageModal({
+const LanguageItem = styled.li<{
+  pointerEvent: string;
+}>`
+  pointer-events: ${({ pointerEvent }) => pointerEvent};
+`;
+
+function Modal({
   setShowModal,
   isUserFluent,
 }: {
@@ -47,6 +60,9 @@ function LanguageModal({
   isUserFluent: boolean;
 }): JSX.Element {
   const [socket, setSocket] = useState<Socket>();
+  const [itv, setItv] = useState<NodeJS.Timer>();
+  const [pE, setPE] = useState('initial');
+  const tos: NodeJS.Timeout[] = useMemo(() => [], []);
   const [roomName, setRoomName] = useState('');
   const [messages, setMessages] = useState<
     {
@@ -105,6 +121,23 @@ function LanguageModal({
   );
 
   const chatHandler = (code: string): void => {
+    setPE('none');
+    if (modalRef.current) {
+      const { current } = modalRef;
+      const bottom = current.scrollHeight;
+      let up = false;
+      setItv(
+        setInterval(() => {
+          up = !up;
+
+          current.scroll({
+            top: up ? 0 : bottom,
+            behavior: 'smooth',
+          });
+        }, 200),
+      );
+    }
+
     if (socket) {
       socket.auth = {
         languageCode: code,
@@ -140,46 +173,86 @@ function LanguageModal({
       console.log(err);
     });
 
-    console.log('tete');
+    newSocket.on('user disconnected', () => {
+      setMessages([
+        ...messages,
+        { message: '[user disconnected]', isSender: false },
+      ]);
+      const id = setTimeout(() => setShowModal(false), 5000);
+      tos.push(id);
+    });
 
-    return () => setSocket(undefined);
-  }, [messages, socket]);
+    return () => {
+      tos.forEach((id) => {
+        clearTimeout(id);
+      });
+      setSocket(undefined);
+    };
+  }, [messages, setShowModal, socket, tos]);
 
   return (
     <>
       {roomName !== 'No fluents available in the chose language' &&
       roomName.length > 1 &&
       socket !== undefined ? (
-        <Chat
-          messages={messages}
-          socket={socket}
-          roomName={roomName}
-          setMessages={setMessages}
-        />
+        <>
+          <Chat
+            messages={messages}
+            socket={socket}
+            roomName={roomName}
+            setMessages={setMessages}
+          />
+          {clearInterval(itv)}
+        </>
       ) : (
-        <Modal
-          onMouseDown={mouseDownHandler}
-          onMouseUp={mouseUpHandler}
-          onMouseOut={(e) => {
-            e.currentTarget.removeEventListener('mousemove', draggingScroll);
-          }}
-          ref={modalRef}
-        >
-          {countries
-            .filter((code) => {
-              const regex = new RegExp(`^${filter}`, 'i');
-              return code.match(regex);
-            })
-            .map((code) => (
-              <li key={code} onClick={() => chatHandler(code)}>
-                {getUnicodeFlagIcon(code)} {code}
-              </li>
-            ))}
-        </Modal>
+        <>
+          <LanguageList
+            onMouseDown={mouseDownHandler}
+            onMouseUp={mouseUpHandler}
+            onMouseOut={(e) => {
+              e.currentTarget.removeEventListener('mousemove', draggingScroll);
+            }}
+            ref={modalRef}
+          >
+            {countries
+              .filter((code) => {
+                const regex = new RegExp(`^${filter}`, 'i');
+                return code.match(regex);
+              })
+              .map((code) => (
+                <LanguageItem
+                  pointerEvent={pE}
+                  key={code}
+                  onClick={() => chatHandler(code)}
+                  onTouchStart={() => chatHandler(code)}
+                >
+                  {getUnicodeFlagIcon(code)} {code}
+                </LanguageItem>
+              ))}
+          </LanguageList>
+          {modalRef.current && (
+            <Overlay target={modalRef.current} show={true} placement="auto">
+              <div
+                style={{
+                  position: 'absolute',
+                  backgroundColor: 'rgba(255, 100, 100, 0.85)',
+                  padding: '2px 10px',
+                  color: 'white',
+                  borderRadius: 3,
+                }}
+              >
+                FINDING SOMEONE TO TALK TO YOU...
+              </div>
+            </Overlay>
+          )}
+        </>
       )}
       <CloseButton
         type="button"
-        onClick={() => {
+        onClick={async () => {
+          if (socket) {
+            socket.disconnect();
+          }
           setShowModal(false);
         }}
       >
@@ -189,4 +262,4 @@ function LanguageModal({
   );
 }
 
-export default LanguageModal;
+export default Modal;

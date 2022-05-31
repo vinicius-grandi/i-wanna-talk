@@ -1,9 +1,10 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, useState, useRef } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import ListGroup from 'react-bootstrap/ListGroup';
 import styled from 'styled-components';
 import { Socket } from 'socket.io-client';
+import Container from 'react-bootstrap/Container';
 
 const Title = styled.h1`
   color: #f6f6f6;
@@ -31,6 +32,7 @@ function Chat({
   >;
   socket: Socket;
 }): JSX.Element {
+  const chatBoxRef = useRef<HTMLDivElement>(null);
   const [text, setText] = useState('');
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -41,7 +43,8 @@ function Chat({
   };
 
   return (
-    <main
+    <Container
+      fluid={true}
       style={{
         width: '100%',
         position: 'absolute',
@@ -54,6 +57,7 @@ function Chat({
       <ListGroup
         variant="flush"
         style={{ maxHeight: '70%', overflowY: 'auto' }}
+        ref={chatBoxRef}
       >
         {messages.map((val, i) => (
           <ListGroup.Item
@@ -74,7 +78,7 @@ function Chat({
           Send
         </Button>
       </Form>
-    </main>
+    </Container>
   );
 }
 

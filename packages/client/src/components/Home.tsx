@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import LanguageModal from './LanguageModal';
+import Modal from './Modal';
 
 const Container = styled.main`
   display: flex;
@@ -55,7 +55,7 @@ function Home(): JSX.Element {
         </NonFluent>
       </Buttons>
       {showModal && (
-        <LanguageModal
+        <Modal
           setShowModal={setShowModal}
           isUserFluent={showModal === 'fluent'}
         />
